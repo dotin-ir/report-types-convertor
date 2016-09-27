@@ -152,7 +152,7 @@ public class XLSListWriter<E> extends XLSBaseWriter {
         if (!rawPOIRecords.isEmpty()) {
             HSSFRow row = sheetContext.getRealSheet().createRow(sheetContext.getAndIncrementLastRowIndex());
             HSSFCell cell = row.createCell(0);
-            cell.setCellValue("لیست رکوردهایی که دارای فرمت نامناسب میباشند");
+            cell.setCellValue(XLSUtils.getProperty(XLSConstants.RECORDS_WITH_BAD_FORMAT));
             cell.setCellType(Cell.CELL_TYPE_STRING);
             for (Integer rowKey : rawPOIRecords.keySet()) {
                 List<HSSFRow> hssfRows = rawPOIRecords.get(rowKey);

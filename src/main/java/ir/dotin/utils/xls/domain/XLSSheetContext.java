@@ -292,7 +292,7 @@ public class XLSSheetContext<E> implements Serializable {
                         objectRecords.add(resultRecord);
                     } catch (Exception ex) {
                         if (StringUtils.isEmpty(ex.getMessage())) {
-                            record.setSimpleDataValue(XLSConstants.ERROR_KEY, XLSConstants.EXCEPTION_OCCURED_IN_MAPPING);
+                            record.setSimpleDataValue(XLSConstants.ERROR_KEY, XLSConstants.EXCEPTION_OCCURRED_IN_MAPPING);
                         } else {
                             record.setSimpleDataValue(XLSConstants.ERROR_KEY, ex.getMessage());
                         }

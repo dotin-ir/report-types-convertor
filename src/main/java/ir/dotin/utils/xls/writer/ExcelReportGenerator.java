@@ -98,7 +98,7 @@ public class ExcelReportGenerator extends XLSBaseWriter {
     public void createReportColorsDescriptionTable(XLSSheetContext sheetContext) {
         if (sheetContext.hasColorDescriptionTable()) {
             int colorColWidth = 6;
-            sheetContext.createCell(XLSConstants.DEFAULT_COLORS_DESCRPTION_TABLE_TITLE, 1, REPORT_TITLE_COL_SIZE + 1, 6, createPOIHeaderRowStyle(sheetContext, IndexedColors.LIGHT_ORANGE.getIndex(), true, true, true, true, 12), Cell.CELL_TYPE_STRING);
+            sheetContext.createCell(XLSConstants.DEFAULT_COLORS_DESCRIPTION_TABLE_TITLE, 1, REPORT_TITLE_COL_SIZE + 1, 6, createPOIHeaderRowStyle(sheetContext, IndexedColors.LIGHT_ORANGE.getIndex(), true, true, true, true, 12), Cell.CELL_TYPE_STRING);
             List<XLSColorDescription> colorsDescription = sheetContext.getColorsDescription();
             int colorRowIndex = 2;
             int colorColStep = 0;
@@ -144,7 +144,7 @@ public class ExcelReportGenerator extends XLSBaseWriter {
             sheet.addMergedRegion(new CellRangeAddress(lastSheetRecordIndex, lastSheetRecordIndex, 0, REPORT_TITLE_COL_SIZE - 1));
             HSSFCell reportConditionsTitleRowCell = reportConditionsTitleRow.createCell(0);
             reportConditionsTitleRowCell.setCellStyle(createPOIHeaderRowStyle(sheetContext, IndexedColors.LIGHT_ORANGE.getIndex(), false, true, true, true, 12));
-            reportConditionsTitleRowCell.setCellValue("مقادیر شرایط اجرای گزارش");
+            reportConditionsTitleRowCell.setCellValue(XLSUtils.getProperty(XLSConstants.DEFAULT_REPORT_CONDITIONS_TABLE_TITLE));
             HSSFRow conditionRow = null;
             int conditionColCount = 0;
             CellStyle reportConditionStyle = workbook.createCellStyle();
