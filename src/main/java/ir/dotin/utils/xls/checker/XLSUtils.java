@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 public class XLSUtils {
 
-    private static String localizationFilePath = XLSUtils.class.getClassLoader().getResource("localization.properties").getPath().replace("%20", " ");
+    private static String localizationFilePath = XLSUtils.class.getClassLoader().getResource("report-localization.properties").getPath().replace("%20", " ");
     private static long lastModified = 0;
     private static Properties properties = new Properties();
     private static Boolean init=false;

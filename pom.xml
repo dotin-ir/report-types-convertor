@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ir.dotin.utils</groupId>
+    <groupId>ir.dotin.core.utils</groupId>
     <artifactId>report-types-convertor</artifactId>
-    <version>1.4</version>
+    <version>1.4.0</version>
     <profiles>
         <profile>
             <id>release</id>
