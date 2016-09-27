@@ -26,6 +26,12 @@ public class XLSListWriterTest {
     public static String dummyExcelFile1Path = System.getProperty("java.io.tmpdir") + "testListWriter.xls";
     public static String dummyExcelFile2Path = System.getProperty("java.io.tmpdir") + "testExcelReportGenerator.xls";
 
+    @BeforeClass
+    public static void deleteDummyFiles() throws Exception {
+        FileUtils.forceDeleteOnExit(new File(dummyExcelFile1Path));
+        FileUtils.forceDeleteOnExit(new File(dummyExcelFile2Path));
+    }
+
     @Test
     public void testListWriter() throws Exception {
         XLSListWriter xlsWriter = new XLSListWriter<CustomerVO>();
@@ -53,12 +59,6 @@ public class XLSListWriterTest {
 
         FileOutputStream outputStream = xlsWriter.createDocument(dummyExcelFile1Path);
 
-    }
-
-    @BeforeClass
-    public static void deleteDummyFiles() throws Exception {
-        FileUtils.forceDeleteOnExit(new File(dummyExcelFile1Path));
-        FileUtils.forceDeleteOnExit(new File(dummyExcelFile2Path));
     }
 
     @Test
