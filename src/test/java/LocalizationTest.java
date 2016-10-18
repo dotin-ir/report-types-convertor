@@ -9,6 +9,11 @@ import org.junit.Test;
 public class LocalizationTest {
     @Test
     public void testLocalization() throws Exception {
-        Assert.assertEquals("Error in localizaton", XLSUtils.getProperty(XLSConstants.DEFAULT_FONT_COLOR_DESCRIPTION), "رنگ پیش فرض فونت");
+        Assert.assertEquals("Error in DEFAULT_FONT_COLOR_DESCRIPTION localizaton", XLSUtils.getProperty(XLSConstants.DEFAULT_FONT_COLOR_DESCRIPTION), "رنگ پیش فرض فونت");
+    }
+
+    @Test
+    public void testLocalizationEmptyRowMessage() throws Exception {
+        Assert.assertEquals("Error in DEFAULT_EMPTY_RECORDS_MESSAGE localizaton", XLSUtils.getProperty(XLSConstants.DEFAULT_EMPTY_RECORDS_MESSAGE), "داده ای وجود ندارد");
     }
 }

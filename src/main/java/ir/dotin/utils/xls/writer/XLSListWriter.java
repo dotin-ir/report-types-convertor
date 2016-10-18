@@ -131,7 +131,7 @@ public class XLSListWriter<E> extends XLSBaseWriter {
         HSSFSheet realSheet = sheetContext.getRealSheet();
         HSSFRow emptyRow = realSheet.createRow(sheetContext.getAndIncrementLastRowIndex());
         HSSFCell firstCell = emptyRow.createCell(0, Cell.CELL_TYPE_STRING);
-        firstCell.setCellValue(sheetContext.getEmptyRecordsMessage());
+        firstCell.setCellValue(XLSUtils.getProperty(sheetContext.getEmptyRecordsMessage()));
         HSSFCellStyle emptyRecordsCellStyle = realSheet.getWorkbook().createCellStyle();
         firstCell.setCellStyle(createPOIDataRowStyle(sheetContext, false, true, true, true, true, sheetContext.getDefaultEvenRowColor(), emptyRecordsCellStyle));
         realSheet.addMergedRegion(new CellRangeAddress(sheetContext.getLastSheetRecordIndex() - 1,
