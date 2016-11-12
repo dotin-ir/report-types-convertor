@@ -196,8 +196,10 @@ public class XLSSheetContext<E> implements Serializable {
     }
 
     public void setRawXLSRecords(List<XLSRecord> rawXLSRecords) {
-        for (XLSRecord record : rawXLSRecords) {
-            getRawRecords().add(record);
+        if (rawXLSRecords != null && !rawXLSRecords.isEmpty()) {
+            for (XLSRecord record : rawXLSRecords) {
+                getRawRecords().add(record);
+            }
         }
     }
 
@@ -466,7 +468,11 @@ public class XLSSheetContext<E> implements Serializable {
     }
 
     public void setEntityRecords(List<E> entityRecords) {
-        this.entityRecords = entityRecords;
+        if (entityRecords!=null && !entityRecords.isEmpty()) {
+            for (E record : entityRecords) {
+                this.entityRecords.add(record);
+            }
+        }
     }
 
     public void addEntityRecord(E entity) {
@@ -904,8 +910,8 @@ public class XLSSheetContext<E> implements Serializable {
 
     public boolean hasColorDescriptionTable() {
         List<XLSColorDescription> colorsDescription = getColorsDescription();
-        for (XLSColorDescription color: colorsDescription){
-            if (!color.isDefaultColor()){
+        for (XLSColorDescription color : colorsDescription) {
+            if (!color.isDefaultColor()) {
                 return true;
             }
         }

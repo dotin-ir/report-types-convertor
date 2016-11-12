@@ -1,7 +1,6 @@
 package ir.dotin.utils.xls.writer;
 
 import ir.dotin.utils.xls.checker.XLSUtils;
-import ir.dotin.utils.xls.clone.DeepCopy;
 import ir.dotin.utils.xls.domain.*;
 import ir.dotin.utils.xls.mapper.XLSEntityToRowMapper;
 import ir.dotin.utils.xls.renderer.XLSDefaultRowCustomizer;
@@ -13,7 +12,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -82,30 +80,28 @@ public class XLSListWriter<E> extends XLSBaseWriter {
 
     private void createXLSRecords(XLSSheetContext sheetContext) {
         XLSEntityToRowMapper entityToRowMapper = sheetContext.getEntityToRowMapper();
-        List entityRecords = sheetContext.getEntityRecords();
-        List rawRecords = sheetContext.getRawRecords();
-        addDummyRecords(sheetContext, entityRecords, rawRecords, entityToRowMapper);
+        addDummyRecords(sheetContext, entityToRowMapper);
         List<XLSColumnDefinition> columnsDefinition = sheetContext.getColumnsDefinition();
         parseRecords(sheetContext, columnsDefinition, entityToRowMapper, sheetContext.getRowCustomizer());
     }
 
-    protected void addDummyRecords(XLSSheetContext sheetContext, List entityRecords, List rawRecords, XLSEntityToRowMapper entityToRowMapper) {
+    protected void addDummyRecords(XLSSheetContext sheetContext, XLSEntityToRowMapper entityToRowMapper) {
         if (entityToRowMapper == null) {
-            addDummyRawRecordsToSheetRows(sheetContext, rawRecords);
-            sheetContext.setRawXLSRecords((List<XLSRecord>) DeepCopy.copy(rawRecords));
+            addDummyRawRecordsToSheetRows(sheetContext);
         } else {
-            addDummyEntityRecordsToSheetRows(sheetContext, entityRecords);
-            sheetContext.setEntityRecords((List) DeepCopy.copy(entityRecords));
+            addDummyEntityRecordsToSheetRows(sheetContext);
         }
     }
 
-    private void addDummyEntityRecordsToSheetRows(XLSSheetContext sheetContext, List<E> entityRecords) {
+    private void addDummyEntityRecordsToSheetRows(XLSSheetContext sheetContext) {
+        List<E> entityRecords = new ArrayList<E>();
         for (int dummyRowIndex = 0; dummyRowIndex < sheetContext.getDummyRowsCount(); dummyRowIndex++) {
             if (sheetContext.getDummyEntity() == null) {
                 throw new IllegalArgumentException("DummyEntity not set on sheet " + sheetContext.getSheetName());
             }
             entityRecords.add((E) sheetContext.getDummyEntity());
         }
+        sheetContext.setEntityRecords(entityRecords);
     }
 
     protected void parseRecords(XLSSheetContext sheetContext, List<XLSColumnDefinition> columnsDefinition,
@@ -307,8 +303,8 @@ public class XLSListWriter<E> extends XLSBaseWriter {
         }
     }
 
-    private void addDummyRawRecordsToSheetRows(XLSSheetContext sheetContext, List<XLSRecord> rawRecords) {
-
+    private void addDummyRawRecordsToSheetRows(XLSSheetContext sheetContext) {
+        ArrayList<XLSRecord> rawRecords = new ArrayList<XLSRecord>();
         for (int dummyRowIndex = 0; dummyRowIndex < sheetContext.getDummyRowsCount(); dummyRowIndex++) {
             List<XLSColumnDefinition> columnsDefinition = sheetContext.getColumnsDefinition();
             Map<String, List<Map<String, String>>> rowDateValue = new HashMap<String, List<Map<String, String>>>();
@@ -331,6 +327,7 @@ public class XLSListWriter<E> extends XLSBaseWriter {
             xlsRecord.setRecordData(rowDateValue);
             rawRecords.add(xlsRecord);
         }
+        sheetContext.setRawXLSRecords(rawRecords);
     }
 
     private int createEmptyCells(XLSSheetContext sheetContext, CellStyle cellStyle, HSSFSheet realSheet, Integer rowCount, List<HSSFRow> rowsForOneRecord, List<XLSColumnDefinition> processColumns, int nextSubRealColIndex) {

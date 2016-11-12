@@ -77,7 +77,7 @@ public class XLSListSectionRenderer extends XLSListWriter implements XLSSectionR
     private void createXLSRecords(XLSListReportSection section, XLSSheetContext sheetContext) {
         List<XLSColumnDefinition> columnsDefinition = section.getHeaderCols();
         XLSEntityToRowMapper entityToRowMapper = section.getEntityToRowMapper();
-        addDummyRecords(sheetContext,section.getRecords(), section.getRawRecords(), entityToRowMapper);
+        addDummyRecords(sheetContext,entityToRowMapper);
         XLSRowCustomizer rowCustomizer = section.getRowCustomizer();
         sheetContext.setEmptyRecordsMessage(section.getEmptyRecordsMessage());
         parseRecords(sheetContext, columnsDefinition, entityToRowMapper,rowCustomizer);
