@@ -323,7 +323,7 @@ public class XLSListReader {
         for (String key : record.keySet()) {
             List<Map<String, String>> map = record.get(key);
             for (Map<String, String> values : map) {
-                for (String realKey: values.keySet()){
+                for (String realKey : values.keySet()) {
                     if (!StringUtils.isEmpty(values.get(realKey))) {
                         return false;
                     }
@@ -465,6 +465,6 @@ public class XLSListReader {
 
     public void addBusinessVariable(int sheetNo, String variableName, Object variableValue) {
         XLSSheetContext sheetContext = getSheetContext(sheetNo);
-        sheetContext.addBusinessVariable(variableName,variableValue);
+        sheetContext.addBusinessVariable(variableName, variableValue);
     }
 }

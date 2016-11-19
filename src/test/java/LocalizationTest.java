@@ -16,4 +16,9 @@ public class LocalizationTest {
     public void testLocalizationEmptyRowMessage() throws Exception {
         Assert.assertEquals("Error in DEFAULT_EMPTY_RECORDS_MESSAGE localizaton", XLSUtils.getProperty(XLSConstants.DEFAULT_EMPTY_RECORDS_MESSAGE), "داده ای وجود ندارد");
     }
+
+    @Test
+    public void testLocalizationSectionEmptyRowMessage() throws Exception {
+        Assert.assertEquals("Error in DEFAULT_EMPTY_RECORDS_MESSAGE localizaton", XLSUtils.getProperty(XLSConstants.DEFAULT_EMPTY_SECTION_RECORDS_MESSAGE), "با شرایط فوق، داده ای وجود ندارد");
+    }
 }

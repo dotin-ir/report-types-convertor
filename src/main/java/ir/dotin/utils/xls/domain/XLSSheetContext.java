@@ -66,6 +66,7 @@ public class XLSSheetContext<E> implements Serializable {
     private Map<Integer, List<HSSFRow>> rawPOIRecords;
     private String emptyRecordsMessage = XLSConstants.DEFAULT_EMPTY_RECORDS_MESSAGE;
     private Integer processedEntityCount = 0;
+    private String readOnlyPassword;
 
 
     public XLSSheetContext(int sheetNumber) {
@@ -468,7 +469,7 @@ public class XLSSheetContext<E> implements Serializable {
     }
 
     public void setEntityRecords(List<E> entityRecords) {
-        if (entityRecords!=null && !entityRecords.isEmpty()) {
+        if (entityRecords != null && !entityRecords.isEmpty()) {
             for (E record : entityRecords) {
                 this.entityRecords.add(record);
             }
@@ -811,10 +812,6 @@ public class XLSSheetContext<E> implements Serializable {
         return businessVariables;
     }
 
-    public void setRawPOIRecords(Map<Integer, List<HSSFRow>> rawPOIRecords) {
-        this.rawPOIRecords = rawPOIRecords;
-    }
-
     public Map<Integer, List<HSSFRow>> getRawPOIRecords() {
         if (rawPOIRecords == null) {
             rawPOIRecords = new HashMap<Integer, List<HSSFRow>>();
@@ -822,12 +819,16 @@ public class XLSSheetContext<E> implements Serializable {
         return rawPOIRecords;
     }
 
-    public void setEmptyRecordsMessage(String emptyRecordsMessage) {
-        this.emptyRecordsMessage = emptyRecordsMessage;
+    public void setRawPOIRecords(Map<Integer, List<HSSFRow>> rawPOIRecords) {
+        this.rawPOIRecords = rawPOIRecords;
     }
 
     public String getEmptyRecordsMessage() {
         return emptyRecordsMessage;
+    }
+
+    public void setEmptyRecordsMessage(String emptyRecordsMessage) {
+        this.emptyRecordsMessage = emptyRecordsMessage;
     }
 
     public XLSColorDescription getColorDescription(String colorKey) {
@@ -916,5 +917,13 @@ public class XLSSheetContext<E> implements Serializable {
             }
         }
         return false;
+    }
+
+    public String getReadOnlyPassword() {
+        return readOnlyPassword;
+    }
+
+    public void setReadOnlyPassword(String readOnlyPassword) {
+        this.readOnlyPassword = readOnlyPassword;
     }
 }

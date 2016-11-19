@@ -29,7 +29,7 @@ public class XLSColumnDefinition implements Serializable {
     private Integer totalSubColumnsWidth = 0;
     private boolean isRealColumn = true;
     private boolean isUniqueColumn = false;
-    private boolean mandatory =true;
+    private boolean mandatory = true;
     private Class<?> fieldType = String.class;
 
     public XLSColumnDefinition() {
@@ -119,7 +119,7 @@ public class XLSColumnDefinition implements Serializable {
     }
 
     public void setSubColumns(List<XLSColumnDefinition> subColumns) {
-        if (subColumns==null || subColumns.isEmpty()) return;
+        if (subColumns == null || subColumns.isEmpty()) return;
         setRealColumn(false);
         this.subColumns = subColumns;
     }

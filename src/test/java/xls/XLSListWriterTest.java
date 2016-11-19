@@ -11,8 +11,6 @@ import ir.dotin.utils.xls.renderer.XLSRowCustomizer;
 import ir.dotin.utils.xls.writer.ExcelReportGenerator;
 import ir.dotin.utils.xls.writer.XLSListWriter;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,6 +36,7 @@ public class XLSListWriterTest {
     public void testListWriter() throws Exception {
         XLSListWriter xlsWriter = new XLSListWriter<CustomerVO>();
         xlsWriter.setSheetName(0, "لیست پرسنل");
+        xlsWriter.setSheetAsReadonly(0, "yourOwnPassword");
         List<XLSColumnDefinition> columnsDefinition = new XLSColumnDefinitionBuilder().
                 addColumnDefinition("customerNumber", "شماره مشتری").addColumnDefinition("nationalCode", "کد ملی").build();
         xlsWriter.setColumnsDefinition(0, columnsDefinition);

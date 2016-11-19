@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by r.rastakfard on 8/10/2016.
  */
-public class AddressVO implements Serializable{
+public class AddressVO implements Serializable {
 
     private String type;
     private String address;

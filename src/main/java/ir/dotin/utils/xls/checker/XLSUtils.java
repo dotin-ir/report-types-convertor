@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
@@ -26,10 +25,9 @@ import java.util.Properties;
  */
 public class XLSUtils {
 
-    private static String localizationFilePath = XLSUtils.class.getClassLoader().getResource("report-localization.properties").getPath().replace("%20", " ");
-    private static long lastModified = 0;
+    private static String localizationFilePath = "/report-localization.properties";
     private static Properties properties = new Properties();
-    private static Boolean init=false;
+    private static Boolean init = false;
 
     static {
         initialize();
@@ -39,19 +37,16 @@ public class XLSUtils {
         try {
             synchronized (init) {
                 if (!init) {
-                    File file = new File(localizationFilePath);
-                    if (file.lastModified() != lastModified) {
-                        properties.clear();
-                        properties.load(new FileInputStream(localizationFilePath));
-                        lastModified = file.lastModified();
-                        init = true;
-                    }
+                    properties.clear();
+                    properties.load(XLSUtils.class.getResourceAsStream(localizationFilePath));
+                    init = true;
                 }
             }
         } catch (IOException e) {
         }
         return init;
     }
+
     public static boolean hasSubColumns(XLSColumnDefinition xlsColumnDefinition) {
         return xlsColumnDefinition.getSubColumns() != null && !xlsColumnDefinition.getSubColumns().isEmpty();
     }

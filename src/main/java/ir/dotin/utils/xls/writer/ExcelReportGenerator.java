@@ -170,7 +170,7 @@ public class ExcelReportGenerator extends XLSBaseWriter {
                     String conditionCellValue = condition.getName() + " : " + values.get(0);
                     label.setCellValue(conditionCellValue);
                     int conditionRowHeight = computeRowHeight(conditionCellValue, 3);
-                    if (conditionRowHeight>conditionRow.getHeight()){
+                    if (conditionRowHeight > conditionRow.getHeight()) {
                         conditionRow.setHeight((short) conditionRowHeight);
                     }
                     label.setCellStyle(createPOIDataRowStyle(sheetContext, false, true, true, true, true, IndexedColors.LIGHT_YELLOW.getIndex(), reportConditionStyle));

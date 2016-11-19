@@ -39,7 +39,7 @@ public class XLSReflectiveRowToEntityMapper<E> implements XLSRowToEntityMapper<E
                 List<Map<String, String>> fieldDataListMap = recordData.get(fieldName);
                 List<String> fieldDataList = convertToDataList(fieldName, fieldDataListMap);
                 try {
-                    Method method = cls.getDeclaredMethod("set"+fieldName, definition.getFieldType());
+                    Method method = cls.getDeclaredMethod("set" + fieldName, definition.getFieldType());
                     method.invoke(entity, fieldDataList);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -49,7 +49,7 @@ public class XLSReflectiveRowToEntityMapper<E> implements XLSRowToEntityMapper<E
                     e.printStackTrace();
                 }
             } else {
-                for (XLSColumnDefinition subDefinition : definition.getSubColumns()){
+                for (XLSColumnDefinition subDefinition : definition.getSubColumns()) {
 
                 }
 

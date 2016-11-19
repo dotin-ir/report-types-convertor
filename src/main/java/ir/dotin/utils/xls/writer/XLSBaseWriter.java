@@ -1,5 +1,6 @@
 package ir.dotin.utils.xls.writer;
 
+import ir.dotin.utils.xls.checker.XLSUtils;
 import ir.dotin.utils.xls.domain.*;
 import ir.dotin.utils.xls.renderer.XLSDefaultRowCustomizer;
 import ir.dotin.utils.xls.renderer.XLSRowCustomizer;
@@ -46,6 +47,9 @@ public abstract class XLSBaseWriter {
         String sheetName = sheetContext.getSheetName();
         HSSFSheet sheet = workbook.createSheet(String.valueOf(StringUtils.isNotEmpty(sheetName) ? sheetName : sheetIndex));
         sheet.setRightToLeft(sheetContext.isRightToLeft());
+        if (StringUtils.isNotEmpty(sheetContext.getReadOnlyPassword())) {
+            sheet.protectSheet(sheetContext.getReadOnlyPassword());
+        }
         sheetContext.setRealSheet(sheet);
     }
 
@@ -79,7 +83,7 @@ public abstract class XLSBaseWriter {
             style.setBorderTop(CellStyle.BORDER_THIN);
             style.setTopBorderColor(IndexedColors.BLUE_GREY.getIndex());
         }
-        style.setFont(createPOIStyleFont(sheetContext,XLSDefaultRowCustomizer.getDefaultCellStyle(sheetContext)));
+        style.setFont(createPOIStyleFont(sheetContext, XLSDefaultRowCustomizer.getDefaultCellStyle(sheetContext)));
         return style;
     }
 
@@ -107,7 +111,7 @@ public abstract class XLSBaseWriter {
             style.setBorderTop(CellStyle.BORDER_THIN);
             style.setTopBorderColor(IndexedColors.BLUE_GREY.getIndex());
         }
-        style.setFont(createPOIStyleFont(sheetContext,xlsCellStyle));
+        style.setFont(createPOIStyleFont(sheetContext, xlsCellStyle));
 
         return style;
     }
@@ -124,8 +128,8 @@ public abstract class XLSBaseWriter {
             font.setFontName(cellFont.getFontName());
             font.setCharSet(FontCharset.ARABIC.getValue());
             font.setColor(cellFont.getFontColor().getColorIndex());
-            workbookFonts.put(cellStyle.getFont(),font);
-        }else{
+            workbookFonts.put(cellStyle.getFont(), font);
+        } else {
             font = workbookFonts.get(cellStyle.getFont());
         }
 
@@ -217,7 +221,7 @@ public abstract class XLSBaseWriter {
     }
 
     public Map<XLSCellFont, HSSFFont> getWorkbookFonts() {
-        if (workbookFonts==null){
+        if (workbookFonts == null) {
             workbookFonts = new HashMap<XLSCellFont, HSSFFont>();
         }
         return workbookFonts;
@@ -243,5 +247,15 @@ public abstract class XLSBaseWriter {
     public void addColorsDescription(int sheetNo, String colorKey, int red, int green, int blue, String description) {
         XLSSheetContext sheetContext = getSheetContext(sheetNo);
         sheetContext.addColorToSheet(new XLSColorDescription(colorKey, red, green, blue, description));
+    }
+
+    public void setSheetAsReadonly(int sheetIndex, String password) {
+        XLSSheetContext sheetContext = getSheetContext(sheetIndex);
+        if (sheetContext != null) {
+            if (StringUtils.isEmpty(password)) {
+                throw new IllegalArgumentException(XLSUtils.getProperty(XLSConstants.INVALID_EMPTY_PASSWORD));
+            }
+            sheetContext.setReadOnlyPassword(password);
+        }
     }
 }

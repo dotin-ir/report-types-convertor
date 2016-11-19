@@ -29,7 +29,7 @@ public class XLSListSectionRenderer extends XLSListWriter implements XLSSectionR
     private void createHeaderPartForSection(XLSListReportSection section, XLSSheetContext sheetContext) {
         HSSFSheet realSheet = createSectionTitleRow(section, sheetContext);
         createSectionAdditionalFieldsRow(section, sheetContext, realSheet);
-        createHeaderRow(sheetContext,section.getHeaderCols());
+        createHeaderRow(sheetContext, section.getHeaderCols());
     }
 
     private void createSectionAdditionalFieldsRow(XLSListReportSection section, XLSSheetContext sheetContext, HSSFSheet realSheet) {
@@ -46,7 +46,7 @@ public class XLSListSectionRenderer extends XLSListWriter implements XLSSectionR
                 realSheet.addMergedRegion(new CellRangeAddress(sheetContext.getLastSheetRecordIndex() - 1, sheetContext.getLastSheetRecordIndex() - 1,
                         colCount, colCount + 2));
                 cell.setCellValue(titleFields.get(cellIndex - 1).getName() + " : " + titleFields.get(cellIndex - 1).getValue());
-                cell.setCellStyle(createPOIHeaderRowStyle(sheetContext, IndexedColors.AQUA.getIndex(), true, true, true, true,12));
+                cell.setCellStyle(createPOIHeaderRowStyle(sheetContext, IndexedColors.AQUA.getIndex(), true, true, true, true, 12));
 
                 for (int emptyCellIndex = colCount + 1; emptyCellIndex <= colCount + 2; emptyCellIndex++) {
                     HSSFCell emptyCell = fieldsRow.createCell(emptyCellIndex, Cell.CELL_TYPE_STRING);
@@ -77,10 +77,23 @@ public class XLSListSectionRenderer extends XLSListWriter implements XLSSectionR
     private void createXLSRecords(XLSListReportSection section, XLSSheetContext sheetContext) {
         List<XLSColumnDefinition> columnsDefinition = section.getHeaderCols();
         XLSEntityToRowMapper entityToRowMapper = section.getEntityToRowMapper();
-        addDummyRecords(sheetContext,entityToRowMapper);
+        addDummyRecords(sheetContext, entityToRowMapper);
         XLSRowCustomizer rowCustomizer = section.getRowCustomizer();
         sheetContext.setEmptyRecordsMessage(section.getEmptyRecordsMessage());
-        parseRecords(sheetContext, columnsDefinition, entityToRowMapper,rowCustomizer);
+        intSheetContextRecords(section, sheetContext);
+        parseRecords(sheetContext, columnsDefinition, entityToRowMapper, rowCustomizer);
+        clearSheetContextRecoreds(sheetContext);
+    }
+
+    private void clearSheetContextRecoreds(XLSSheetContext sheetContext) {
+        sheetContext.getEntityRecords().clear();
+        sheetContext.getRawRecords().clear();
+        sheetContext.getRawPOIRecords().clear();
+    }
+
+    private void intSheetContextRecords(XLSListReportSection section, XLSSheetContext sheetContext) {
+        sheetContext.setRawRecords(section.getRawRecords());
+        sheetContext.setEntityRecords(section.getRecords());
     }
 
 }

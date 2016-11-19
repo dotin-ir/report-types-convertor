@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by r.rastakfard on 7/21/2016.
  */
-public class CustomerVO implements Serializable{
+public class CustomerVO implements Serializable {
 
     private Long customerNumber;
     private String nationalCode;

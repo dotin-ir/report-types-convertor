@@ -11,5 +11,6 @@ import java.util.Map;
  */
 public interface XLSEntityToRowMapper<E> {
     XLSRowCellsData map(E entity, XLSSheetContext sheetContext);// throws Exception;
+
     Map<String, XLSCellStyle> getRecordDesign(E entity, XLSSheetContext sheetContext);
 }

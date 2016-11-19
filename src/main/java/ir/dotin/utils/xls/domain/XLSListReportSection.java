@@ -32,7 +32,7 @@ public class XLSListReportSection<E> extends XLSReportSection {
     }
 
     public List<XLSReportField> getTitleFields() {
-        if (titleFields==null){
+        if (titleFields == null) {
             titleFields = new ArrayList<XLSReportField>();
         }
         return titleFields;

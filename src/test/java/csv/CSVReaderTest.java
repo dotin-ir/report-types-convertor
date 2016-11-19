@@ -29,10 +29,10 @@ public class CSVReaderTest {
         }
         CSVReader obj = new CSVReader(csvText, true);
         List<Map<String, String>> parsedLines = obj.parse();
-        Assert.assertEquals(8,parsedLines.size());
+        Assert.assertEquals(8, parsedLines.size());
         for (Map<String, String> record : parsedLines) {
             for (String fieldName : record.keySet()) {
-               log.info(fieldName + " : " + record.get(fieldName) );
+                log.info(fieldName + " : " + record.get(fieldName));
             }
             System.out.println();
         }

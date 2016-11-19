@@ -14,10 +14,10 @@ import java.util.Map;
  */
 public class XLSCellStyleBuilder {
     Map<String, XLSCellStyle> result;
+    Map<String, String> fonts;
     private short defaultRowBackgroundColor;
     private short defaultRowFontColor;
     private String defaultRowFont;
-    Map<String, String> fonts;
     private XLSSheetContext sheetContext;
 
     public XLSCellStyleBuilder(XLSSheetContext sheetContext) {
@@ -45,12 +45,12 @@ public class XLSCellStyleBuilder {
         return null;
     }
 
-    public void setDefaultRowBackgroundColor(short defaultRowBackgroundColor) {
-        this.defaultRowBackgroundColor = defaultRowBackgroundColor;
-    }
-
     public short getDefaultRowBackgroundColor() {
         return defaultRowBackgroundColor;
+    }
+
+    public void setDefaultRowBackgroundColor(short defaultRowBackgroundColor) {
+        this.defaultRowBackgroundColor = defaultRowBackgroundColor;
     }
 
     public XLSCellStyleBuilder setDefaultRowFontColor(short defaultRowFontColor) {

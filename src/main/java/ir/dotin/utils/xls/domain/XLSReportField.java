@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by r.rastakfard on 7/10/2016.
  */
-public class XLSReportField<E>  implements Serializable {
+public class XLSReportField<E> implements Serializable {
     private String name;
     private String value;
     private List<E> values;

@@ -107,12 +107,12 @@ public class XLSCellStyle implements Serializable {
                 .toHashCode();
     }
 
-    public void setRealCellStyle(HSSFCellStyle realCellStyle) {
-        this.realCellStyle = realCellStyle;
-    }
-
     public HSSFCellStyle getRealCellStyle() {
         return realCellStyle;
+    }
+
+    public void setRealCellStyle(HSSFCellStyle realCellStyle) {
+        this.realCellStyle = realCellStyle;
     }
 
     public XLSCellFont getFont() {

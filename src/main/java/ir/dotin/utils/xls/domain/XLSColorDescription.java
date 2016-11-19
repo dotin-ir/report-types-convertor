@@ -67,7 +67,7 @@ public class XLSColorDescription implements Serializable {
     }
 
     public void validate() {
-        if (StringUtils.isEmpty(key)){
+        if (StringUtils.isEmpty(key)) {
             throw new IllegalArgumentException("Color key is empty!");
         }
         if (red < 0 || red > 255) {
@@ -105,12 +105,12 @@ public class XLSColorDescription implements Serializable {
         this.defaultColor = defaultColor;
     }
 
-    public void setRealIndex(int realIndex) {
-        this.realIndex = realIndex;
-    }
-
     public int getRealIndex() {
         return realIndex;
+    }
+
+    public void setRealIndex(int realIndex) {
+        this.realIndex = realIndex;
     }
 
     @Override
