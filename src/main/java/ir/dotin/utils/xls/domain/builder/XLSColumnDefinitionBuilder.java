@@ -3,10 +3,7 @@ package ir.dotin.utils.xls.domain.builder;
 import ir.dotin.utils.xls.domain.XLSColumnDefinition;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by r.rastakfard on 7/2/2016.
@@ -18,6 +15,7 @@ public class XLSColumnDefinitionBuilder<B> {
     private List<XLSColumnDefinition> tmpColumnDefinitions;
     private List<String> tmpUniqueColumns;
     private List<String> optionalColumns;
+    private int orderIndex = 0;
 
     public XLSColumnDefinitionBuilder() {
         columnDefinitions = new HashMap<String, XLSColumnDefinition>();
@@ -29,7 +27,8 @@ public class XLSColumnDefinitionBuilder<B> {
     public XLSColumnDefinitionBuilder addColumnDefinition(String name, String fName) {
         synchronized (columnDefinitions) {
             checkColumnDuplication(name);
-            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(columnDefinitions.size(), name, fName, defaultColWidth);
+            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(orderIndex, name, fName, defaultColWidth);
+            orderIndex++;
             columnDefinitions.put(name, columnDefinition);
             return this;
         }
@@ -44,7 +43,8 @@ public class XLSColumnDefinitionBuilder<B> {
     public XLSColumnDefinitionBuilder addColumnDefinition(String name, String fName, boolean hidden) {
         synchronized (columnDefinitions) {
             checkColumnDuplication(name);
-            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(columnDefinitions.size(), name, fName, defaultColWidth, hidden);
+            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(orderIndex, name, fName, defaultColWidth, hidden);
+            orderIndex++;
             columnDefinitions.put(name, columnDefinition);
             return this;
         }
@@ -53,7 +53,8 @@ public class XLSColumnDefinitionBuilder<B> {
     public XLSColumnDefinitionBuilder addColumnDefinition(String name, String fName, Integer width) {
         synchronized (columnDefinitions) {
             checkColumnDuplication(name);
-            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(columnDefinitions.size(), name, fName, width);
+            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(orderIndex, name, fName, width);
+            orderIndex++;
             columnDefinitions.put(name, columnDefinition);
             return this;
         }
@@ -62,7 +63,8 @@ public class XLSColumnDefinitionBuilder<B> {
     public XLSColumnDefinitionBuilder addColumnDefinition(String name, String fName, Integer width, boolean hidden) {
         synchronized (columnDefinitions) {
             checkColumnDuplication(name);
-            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(columnDefinitions.size(), name, fName, width, hidden);
+            XLSColumnDefinition columnDefinition = new XLSColumnDefinition(orderIndex, name, fName, width, hidden);
+            orderIndex++;
             columnDefinitions.put(name, columnDefinition);
             return this;
         }
@@ -102,13 +104,21 @@ public class XLSColumnDefinitionBuilder<B> {
                 }
             }
         }
-        return new ArrayList(columnDefinitions.values());
+        List<XLSColumnDefinition> result = new ArrayList(columnDefinitions.values());
+        Collections.sort(result, new Comparator<XLSColumnDefinition>() {
+            public int compare(XLSColumnDefinition o1, XLSColumnDefinition o2) {
+                return o1.getOrder().compareTo(o2.getOrder());
+            }
+        });
+        return result;
     }
 
     public XLSColumnDefinitionBuilder addColumnDefinition(String name, String fName, List<XLSColumnDefinition> subCoumns) {
         synchronized (columnDefinitions) {
             checkColumnDuplication(name);
             XLSColumnDefinition columnDefinition = new XLSColumnDefinition(defaultColWidth, name, fName);
+            columnDefinition.setOrder(orderIndex);
+            orderIndex++;
             columnDefinition.setRealColumn(false);
             columnDefinition.setSubColumns(subCoumns);
             columnDefinitions.put(name, columnDefinition);
@@ -142,6 +152,8 @@ public class XLSColumnDefinitionBuilder<B> {
         synchronized (columnDefinitions) {
             checkColumnDuplication(colName);
             XLSColumnDefinition columnDefinition = new XLSColumnDefinition(defaultColWidth, colName, fName);
+            columnDefinition.setOrder(orderIndex);
+            orderIndex++;
             columnDefinition.setRealColumn(true);
             columnDefinition.setBasicInfoCollectionKey(basicInfoKey);
             columnDefinitions.put(colName, columnDefinition);
@@ -150,7 +162,7 @@ public class XLSColumnDefinitionBuilder<B> {
     }
 
     public XLSColumnDefinitionBuilder addColumnDefinitionWithBasicInfo(String colName, String fName, List<B> basicInfoList) {
-        return addColumnDefinitionWithBasicInfo(colName,fName,colName,basicInfoList);
+        return addColumnDefinitionWithBasicInfo(colName, fName, colName, basicInfoList);
     }
 
     public XLSColumnDefinitionBuilder addColumnDefinitionWithBasicInfo(String colName, String fName, String basicInfoKey, List<B> basicInfoCollection) {
@@ -160,6 +172,8 @@ public class XLSColumnDefinitionBuilder<B> {
                 throw new IllegalArgumentException("Basic info key is empty!");
             }
             XLSColumnDefinition columnDefinition = new XLSColumnDefinition(defaultColWidth, colName, fName);
+            columnDefinition.setOrder(orderIndex);
+            orderIndex++;
             columnDefinition.setRealColumn(true);
             columnDefinition.setBasicInfoCollection(basicInfoCollection);
             columnDefinition.setBasicInfoCollectionKey(basicInfoKey);
