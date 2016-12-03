@@ -5,7 +5,7 @@
 
     <groupId>ir.dotin.core.utils</groupId>
     <artifactId>report-types-convertor</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.3-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
