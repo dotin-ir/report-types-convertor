@@ -40,7 +40,8 @@ public class XLSReportAllAsErrorUniqueChecker extends XLSUniqueChecker {
                     return false;
                 }
             }
-            for (XLSColumnDefinition subDefinition : definition.getSubColumns()) {
+            List<XLSColumnDefinition> subColumns = definition.getSubColumns();
+            for (XLSColumnDefinition subDefinition : subColumns) {
                 if (subDefinition.isUniqueColumn()) {
                     List<Map<String, String>> subRecordDataList = currentRecord.get(definition.getName());
                     for (Map<String, String> data : subRecordDataList) {

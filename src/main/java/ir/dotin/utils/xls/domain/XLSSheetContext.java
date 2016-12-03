@@ -67,6 +67,7 @@ public class XLSSheetContext<E> implements Serializable {
     private String emptyRecordsMessage = XLSConstants.DEFAULT_EMPTY_RECORDS_MESSAGE;
     private Integer processedEntityCount = 0;
     private String readOnlyPassword;
+    private int sheetIndex;
 
 
     public XLSSheetContext(int sheetNumber) {
@@ -104,7 +105,8 @@ public class XLSSheetContext<E> implements Serializable {
         List<XLSColumnDefinition> result = new ArrayList<XLSColumnDefinition>();
         for (XLSColumnDefinition definition : columnsDefinition) {
             if (!definition.isRealColumn()) {
-                for (XLSColumnDefinition subDef : definition.getSubColumns()) {
+                List<XLSColumnDefinition> subColumns = definition.getSubColumns();
+                for (XLSColumnDefinition subDef : subColumns) {
                     result.add(subDef);
                 }
             } else {
@@ -394,7 +396,8 @@ public class XLSSheetContext<E> implements Serializable {
                 realHeaderColIndex = 0;
                 for (XLSColumnDefinition headerCol : headerColumns) {
                     if (hasSubColumns(headerCol)) {
-                        for (XLSColumnDefinition subColDef : headerCol.getSubColumns()) {
+                        List<XLSColumnDefinition> subColumns = headerCol.getSubColumns();
+                        for (XLSColumnDefinition subColDef : subColumns) {
                             Integer width = subColDef.getWidth();
                             String subColValue = getCellValue(subColsRow.getCell(realHeaderColIndex));
                             if (subColValue == null) return false;
@@ -750,7 +753,8 @@ public class XLSSheetContext<E> implements Serializable {
                 if (definition.isUniqueColumn()) {
                     uniqueKeys.add(definition.getName());
                 }
-                for (XLSColumnDefinition subDefinition : definition.getSubColumns()) {
+                List<XLSColumnDefinition> subColumns = definition.getSubColumns();
+                for (XLSColumnDefinition subDefinition : subColumns) {
                     if (subDefinition.isUniqueColumn()) {
                         uniqueKeys.add(subDefinition.getName());
                     }
@@ -925,5 +929,13 @@ public class XLSSheetContext<E> implements Serializable {
 
     public void setReadOnlyPassword(String readOnlyPassword) {
         this.readOnlyPassword = readOnlyPassword;
+    }
+
+    public void setSheetIndex(int sheetIndex) {
+        this.sheetIndex = sheetIndex;
+    }
+
+    public int getSheetIndex() {
+        return sheetIndex;
     }
 }

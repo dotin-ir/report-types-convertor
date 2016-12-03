@@ -7,14 +7,16 @@ import ir.dotin.utils.xls.renderer.XLSDefaultRowCustomizer;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by r.rastakfard on 7/12/2016.
  */
-public class XLSCellStyleBuilder {
+public class XLSCellStyleBuilder<B> {
     Map<String, XLSCellStyle> result;
-    Map<String, String> fonts;
+    Map<String, Short> fontsColor;
+    Map<String, String> fontsName;
     private short defaultRowBackgroundColor;
     private short defaultRowFontColor;
     private String defaultRowFont;
@@ -23,7 +25,8 @@ public class XLSCellStyleBuilder {
     public XLSCellStyleBuilder(XLSSheetContext sheetContext) {
         this.sheetContext = sheetContext;
         result = new HashMap<String, XLSCellStyle>();
-        fonts = new HashMap<String, String>();
+        fontsColor = new HashMap<String, Short>();
+        fontsName = new HashMap<String, String>();
     }
 
     public XLSCellStyleBuilder addCellDesignWithBackgroundColor(String cellName, XLSCellStyle cellDesign) {
@@ -38,11 +41,42 @@ public class XLSCellStyleBuilder {
     }
 
     public Map<String, XLSCellStyle> build() {
+        if (!fontsColor.isEmpty()) {
+            XLSCellStyle xlsCellStyle;
+            for (String colName : fontsColor.keySet()) {
+                if (result.containsKey(colName)){
+                    xlsCellStyle = result.get(colName);
+                }else{
+                    xlsCellStyle = XLSDefaultRowCustomizer.getDefaultCellStyle(sheetContext);
+                    result.put(colName,xlsCellStyle);
+                }
+                xlsCellStyle.setFontColor(fontsColor.get(colName));
+            }
+        }
+        if (!fontsName.isEmpty()) {
+            XLSCellStyle xlsCellStyle;
+            for (String colName : fontsName.keySet()) {
+                if (result.containsKey(colName)){
+                    xlsCellStyle = result.get(colName);
+                }else{
+                    xlsCellStyle = XLSDefaultRowCustomizer.getDefaultCellStyle(sheetContext);
+                    result.put(colName,xlsCellStyle);
+                }
+                xlsCellStyle.setFontName(fontsName.get(colName));
+            }
+        }
         return result;
     }
 
     public XLSCellStyleBuilder addCellDesignWithFontColor(String cellName, short fontColor) {
-        return null;
+        if (StringUtils.isEmpty(cellName)) {
+            throw new IllegalArgumentException("Cell Name is Empty!");
+        }
+        if (StringUtils.isEmpty(cellName)) {
+            throw new IllegalArgumentException("Font color is Empty!");
+        }
+        fontsColor.put(cellName, fontColor);
+        return this;
     }
 
     public short getDefaultRowBackgroundColor() {
@@ -73,7 +107,7 @@ public class XLSCellStyleBuilder {
         if (StringUtils.isEmpty(fontName)) {
             throw new IllegalArgumentException("Cell name is empty!");
         }
-        fonts.put(colName, fontName);
+        fontsName.put(colName, fontName);
         return this;
     }
 
@@ -83,4 +117,18 @@ public class XLSCellStyleBuilder {
         defaultCellDesign.setBackGroundColor(colorDescription);
         return defaultCellDesign;
     }
+
+    public XLSCellStyleBuilder addCellDesignWithBasicInfo(String colName) {
+
+        return this;
+    }
+
+    public XLSCellStyleBuilder addCellDesignWithBasicInfo(String colName, String basicInfoKey) {
+        return this;
+    }
+
+    public XLSCellStyleBuilder addCellDesignWithBasicInfo(String colName, List<B> basicInfoCollection) {
+        return this;
+    }
+
 }

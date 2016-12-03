@@ -122,4 +122,13 @@ public class XLSCellStyle implements Serializable {
     public void setFont(XLSCellFont font) {
         this.font = font;
     }
+
+    public void setFontColor(Short color) {
+        XLSColorDescription fontColor = getFont().getFontColor();
+        fontColor.setColorIndex(color);
+    }
+
+    public void setFontName(String name) {
+        getFont().setFontName(name);
+    }
 }

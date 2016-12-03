@@ -31,20 +31,30 @@ public class DropDownListTests {
         namedCell.setNameName("hidden");
         namedCell.setRefersToFormula("hiddenSheet!$A$1:$A$" + countryName.length);
         DVConstraint constraint = DVConstraint.createFormulaListConstraint("hidden");
-        CellRangeAddressList addressList = new CellRangeAddressList(0, 0, 0, 0);
+
+
+        CellRangeAddressList addressList = new CellRangeAddressList(0, 99, 0, 0);
         HSSFDataValidation validation = new HSSFDataValidation(addressList, constraint);
-        workbook.setSheetHidden(1, true);
         validation.createErrorBox("انتخاب شهر", "شهر انتخابی در لیست وجود ندارد");
         realSheet.addValidationData(validation);
+
+/*        CellRangeAddressList addressList2 = new CellRangeAddressList(1, 1, 0, 0);
+        HSSFDataValidation validation2 = new HSSFDataValidation(addressList2, constraint);
+        validation2.createErrorBox("انتخاب شهر", "شهر انتخابی در لیست وجود ندارد");
+        realSheet.addValidationData(validation2);*/
+
+        workbook.setSheetHidden(1, true);
+
 //        workbook.
         realSheet.createRow(0).createCell(0).setCellValue("تهران");
+        realSheet.createRow(1).createCell(0).setCellValue("تبریز");
         FileOutputStream stream = new FileOutputStream("d:\\range.xls");
         workbook.write(stream);
         stream.close();
 
-        Biff8EncryptionKey.setCurrentUserPassword("pass");
+      /*  Biff8EncryptionKey.setCurrentUserPassword("pass");
         NPOIFSFileSystem fs = new NPOIFSFileSystem(new File("file.xls"), true);
         HSSFWorkbook hwb = new HSSFWorkbook(fs.getRoot(), true);
-        Biff8EncryptionKey.setCurrentUserPassword(null);
+        Biff8EncryptionKey.setCurrentUserPassword(null);*/
     }
 }

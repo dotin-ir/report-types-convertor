@@ -23,8 +23,8 @@ import java.util.*;
  */
 public class XLSListWriterTest {
 
-    public static String dummyExcelFile1Path = System.getProperty("java.io.tmpdir") + "testListWriter.xls";
-    public static String dummyExcelFile2Path = System.getProperty("java.io.tmpdir") + "testExcelReportGenerator.xls";
+    public static String dummyExcelFile1Path = System.getProperty("java.io.tmpdir") + "testListWriter" + System.currentTimeMillis() + ".xls";
+    public static String dummyExcelFile2Path = System.getProperty("java.io.tmpdir") + "testExcelReportGenerator" + System.currentTimeMillis() + ".xls";
 
     @BeforeClass
     public static void deleteDummyFiles() throws Exception {
@@ -34,32 +34,78 @@ public class XLSListWriterTest {
 
     @Test
     public void testListWriter() throws Exception {
+
+        final List<String> locations = createLocationBasiceInfo();
+        final List<String> nationalCodes = createnationalCodesBasiceInfo();
+
         XLSListWriter xlsWriter = new XLSListWriter<CustomerVO>();
-        xlsWriter.setSheetName(0, "لیست پرسنل");
-        xlsWriter.setSheetAsReadonly(0, "yourOwnPassword");
-        List<XLSColumnDefinition> columnsDefinition = new XLSColumnDefinitionBuilder().
-                addColumnDefinition("customerNumber", "شماره مشتری").addColumnDefinition("nationalCode", "کد ملی").build();
-        xlsWriter.setColumnsDefinition(0, columnsDefinition);
-        xlsWriter.addColorsDescription(0, "green", 0, 255, 0, "توصیف تستی 1");
+        xlsWriter.setBasicInfoSheetProtectionPassword("yourOwnPassword");
+        xlsWriter.addBasicInfoCollection("nationalCodesInfo", "انتخاب کد ملی", "کد ملی وارد شده در لیست وجود ندارد", nationalCodes);
+        xlsWriter.addBasicInfoCollection("locationBasicInfo", "انتخاب شهر", "شهر انتخابی در لیست وجود ندارد", locations);
+        xlsWriter.setBasicInfoSheetProtectionPassword("test1");
+        initSheet(xlsWriter, 0, "لیست پرسنل");
+//        initSheet(xlsWriter,1,"لیست پرسنل2");
+        FileOutputStream outputStream = xlsWriter.createDocument(dummyExcelFile1Path);
+
+    }
+
+    private List<String> createnationalCodesBasiceInfo() {
+        List<String> codes = new ArrayList<String>();
+        codes.add("0074528637");
+        codes.add("1521452244");
+        codes.add("5845455454");
+        codes.add("6998653313");
+        return codes;
+    }
+
+    private void initSheet(XLSListWriter xlsWriter, int sheetIndex, String sheetName) {
+        xlsWriter.setSheetName(sheetIndex, sheetName);
+//        xlsWriter.setSheetAsReadonly(sheetIndex, "yourOwnPassword");
+        List<XLSColumnDefinition> columnsDefinition = new XLSColumnDefinitionBuilder()
+                .addColumnDefinition("customerNumber", "شماره مشتری")
+                .addColumnDefinitionWithBasicInfo("nationalCode", "کد ملی", "nationalCodesInfo")
+//                .addColumnDefinitionWithBasicInfo("birthLocation", "محل تولد", "locationBasicInfo")
+                .addColumnDefinitionWithBasicInfo("birthLocation", "محل تولد", createLocationBasiceInfo())
+//                .addColumnDefinitionWithBasicInfo("birthLocation", "محل تولد", "locationBasicInfo4",locations)
+                .build();
+
+        xlsWriter.setColumnsDefinition(sheetIndex, columnsDefinition);
+        xlsWriter.addColorsDescription(sheetIndex, "green", 0, 255, 0, "توصیف تستی 1");
         List<CustomerVO> customers = generateDummyCustomers();
-        xlsWriter.setRecords(0, customers);
-        xlsWriter.setRightToLeft(0, true);
-        xlsWriter.setEntityToRowMapper(0, new XLSEntityToRowMapper<CustomerVO>() {
+        xlsWriter.setRecords(sheetIndex, customers);
+        xlsWriter.setRightToLeft(sheetIndex, true);
+        xlsWriter.setEntityToRowMapper(sheetIndex, new XLSEntityToRowMapper<CustomerVO>() {
             public XLSRowCellsData map(CustomerVO entity, XLSSheetContext sheetContext) {
                 return new XLSRowCellsDataBuilder()
                         .addCellSimpleData("customerNumber", String.valueOf(entity.getCustomerNumber()))
                         .addCellSimpleData("nationalCode", String.valueOf(entity.getNationalCode()))
+                        .addCellSimpleData("birthLocation", entity.getBirthLocation())
                         .build();
             }
 
             public Map<String, XLSCellStyle> getRecordDesign(CustomerVO entity, XLSSheetContext sheetContext) {
                 return new XLSCellStyleBuilder(sheetContext)
+//                        .addCellDesignWithBasicInfo("birthLocation")
+//                        .showCellDesignWithBasicInfo("birthLocation",false)
+//                        .addCellDesignWithBasicInfo("birthLocation","locationBasicInfo")
+//                        .addCellDesignWithBasicInfo("birthLocation",locations)
                         .build();
             }
         });
+    }
 
-        FileOutputStream outputStream = xlsWriter.createDocument(dummyExcelFile1Path);
-
+    private List<String> createLocationBasiceInfo() {
+        List<String> countryNames = new ArrayList<String>();
+        countryNames.add("تهران");
+        countryNames.add("تبریز");
+        countryNames.add("همدان");
+        countryNames.add("اصفهان");
+        countryNames.add("ایلام");
+        countryNames.add("قزوین");
+        countryNames.add("ملایر");
+        countryNames.add("رشت");
+        countryNames.add("ساری");
+        return countryNames;
     }
 
     @Test
@@ -71,6 +117,7 @@ public class XLSListWriterTest {
         generator.setReportTitle(0, "گزارش لیست پرسنل");
         generator.setSheetName(0, "لیست پرسنل");
 
+        generator.addBasicInfoCollection("nationalCodesInfo", "انتخاب کد ملی", "کد ملی وارد شده در لیست وجود ندارد", createnationalCodesBasiceInfo());
         generator.addColorsDescription(0, "red", 255, 0, 0, "توصیف 1");
         generator.addColorsDescription(0, "blue", 0, 0, 255, "توصیف 2");
         generator.addColorsDescription(0, "green", 0, 255, 0, "توصیف 3");
@@ -96,7 +143,7 @@ public class XLSListWriterTest {
                 .build();
         List<XLSColumnDefinition> cols = new XLSColumnDefinitionBuilder()
                 .addColumnDefinition("customerNumber", "شماره مشتری")
-                .addColumnDefinition("nationalCode", "کد ملی")
+                .addColumnDefinitionWithBasicInfo("nationalCode", "کد ملی", "nationalCodesInfo")
                 .addColumnDefinition("addresses", "آدرس", addressSubColumns)
                 .build();
         xlsReportSection.setHeaderCols(cols);
@@ -137,16 +184,18 @@ public class XLSListWriterTest {
         AddressVO addressVO1 = new AddressVO("آدرس منزل", "تهران - خیابان انقلاب - خیابان اردیبهشت - پلاک 18");
         AddressVO addressVO11 = new AddressVO("محل کار", "تهران - خیابان انقلاب - خیابان اردیبهشت - پلاک 19");
         customer1.setAddresses(Arrays.asList(addressVO1, addressVO11));
+        customer1.setBirthLocation("تهران");
         CustomerVO customer2 = new CustomerVO(5678l, "0065498714");
         AddressVO addressVO2 = new AddressVO("آدرس منزل", "تهران - خیابان انقلاب - خیابان فروردین - پلاک 12");
         customer2.setAddresses(Arrays.asList(addressVO2));
+        customer2.setBirthLocation("تبریز");
         CustomerVO customer3 = new CustomerVO(25874l, "3300216547");
         AddressVO addressVO3 = new AddressVO("محل کار", "تهران - خیابان ونک - خیابان گاندی - پلاک 22");
         customer3.setAddresses(Arrays.asList(addressVO3));
+        customer3.setBirthLocation("همدان");
         result.add(customer1);
         result.add(customer2);
         result.add(customer3);
         return result;
     }
-
 }

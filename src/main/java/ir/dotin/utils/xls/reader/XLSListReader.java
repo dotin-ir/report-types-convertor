@@ -212,7 +212,8 @@ public class XLSListReader {
                     int firstCellRealRowSize = 0;
                     Map<String, String> cellData = new HashMap<String, String>();
                     for (int subColIndex = 0; subColIndex < columnDefinition.getSubColumns().size(); subColIndex++) {
-                        XLSColumnDefinition subColumn = columnDefinition.getSubColumns().get(subColIndex);
+                        List<XLSColumnDefinition> subColumns = columnDefinition.getSubColumns();
+                        XLSColumnDefinition subColumn = subColumns.get(subColIndex);
                         HSSFCell tmpCell = tmpRecordFirstRow.getCell(tmpRealCellIndex);
                         cellRealRowSize = getCellRealRowSize(tmpRealCellIndex, sheetContext, tmpCell);
                         try {
@@ -413,7 +414,8 @@ public class XLSListReader {
                     if (subColValue == null) {
                         subColValue = "";
                     }
-                    for (XLSColumnDefinition subDefinition : headerCol.getSubColumns()) {
+                    List<XLSColumnDefinition> subColumns = headerCol.getSubColumns();
+                    for (XLSColumnDefinition subDefinition : subColumns) {
                         if (!subDefinition.isHidden()) {
                             if (subDefinition.getfName().equals(subColValue)) {
                                 if (width != subDefinition.getWidth()) {

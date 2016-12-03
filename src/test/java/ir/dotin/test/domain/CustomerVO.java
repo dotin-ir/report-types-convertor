@@ -11,6 +11,7 @@ public class CustomerVO implements Serializable {
     private Long customerNumber;
     private String nationalCode;
     private List<AddressVO> addresses;
+    private String birthLocation;
 
     public CustomerVO(Long customerNumber, String nationalCode) {
         this.customerNumber = customerNumber;
@@ -39,5 +40,13 @@ public class CustomerVO implements Serializable {
 
     public void setAddresses(List<AddressVO> addresses) {
         this.addresses = addresses;
+    }
+
+    public String getBirthLocation() {
+        return birthLocation;
+    }
+
+    public void setBirthLocation(String birthLocation) {
+        this.birthLocation = birthLocation;
     }
 }

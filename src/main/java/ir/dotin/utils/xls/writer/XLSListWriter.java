@@ -10,6 +10,7 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,24 +58,31 @@ public class XLSListWriter<E> extends XLSBaseWriter {
     }
 
     public ByteArrayOutputStream createDocument() throws IOException {
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        int sheetIndex = 0;
-        for (XLSSheetContext sheetContext : getSheetContextsValues()) {
-            sheetIndex += 1;
-            createSheet(workbook, sheetIndex, sheetContext);
+        int sheetIndex = 1;
+        Collection<XLSSheetContext> sheetContextsValues = getSheetContextsValues();
+
+        refreshBasicInfoBasedOnSheetContexts();
+        for (XLSSheetContext sheetContext : sheetContextsValues) {
+            createSheet(sheetIndex, sheetContext);
             List<XLSColumnDefinition> columnsDefinition = sheetContext.getColumnsDefinition();
             createHeaderRow(sheetContext, columnsDefinition);
             createXLSRecords(sheetContext);
+            sheetIndex = generateSheetIndex(sheetContext,sheetIndex);
         }
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        workbook.write(byteArrayOutputStream);
+        getWorkBook().write(byteArrayOutputStream);
         byteArrayOutputStream.flush();
         byteArrayOutputStream.close();
         return byteArrayOutputStream;
     }
 
+
     public void createReportColorsDescriptionTable(XLSSheetContext sheetContext) {
 
+    }
+
+    protected List<XLSColumnDefinition> getSheetContextColumnsDefinition(XLSSheetContext sheetContext) {
+        return sheetContext.getColumnsDefinition();
     }
 
 
@@ -243,6 +251,7 @@ public class XLSListWriter<E> extends XLSBaseWriter {
                                     realSubColIndex = nextSubRealColIndex;
                                     nextSubRealColIndex = realSubColIndex + width;
                                     HSSFCell cell = rowsForOneRecord.get(rowValueIndex).createCell(realSubColIndex, Cell.CELL_TYPE_STRING);
+
                                     int rowHeight = computeRowHeight(xlsCellValue, width);
                                     if (rowHeight > rowsForOneRecord.get(rowValueIndex).getHeight()) {
                                         rowsForOneRecord.get(rowValueIndex).setHeight((short) rowHeight);
@@ -260,6 +269,13 @@ public class XLSListWriter<E> extends XLSBaseWriter {
                                     if (rowValues.size() < rowCount && rowValueIndex == rowValues.size() - 1) {
                                         realSheet.addMergedRegion(new CellRangeAddress(sheetContext.getLastSheetRecordIndex() - rowCount + rowValueIndex,
                                                 sheetContext.getLastSheetRecordIndex() - 1, realSubColIndex, realSubColIndex + width - 1));
+                                        if (StringUtils.isNotEmpty(definition.getBasicInfoCollectionKey()) &&
+                                                getBasiceInfos().containsKey(definition.getBasicInfoCollectionKey())){
+                                            attachValidationConstraintToMergedCell(sheetContext, realSheet, definition,sheetContext.getLastSheetRecordIndex() - rowCount + rowValueIndex,
+                                                    sheetContext.getLastSheetRecordIndex() - 1, realSubColIndex, realSubColIndex + width - 1);
+                                        }
+
+
                                         for (int emptyRowIndex = rowValueIndex + 1; emptyRowIndex < rowCount; emptyRowIndex++) {
                                             for (int emptyCellIndex = realSubColIndex; emptyCellIndex <= realSubColIndex + width - 1; emptyCellIndex++) {
                                                 HSSFCell emptyCell = rowsForOneRecord.get(emptyRowIndex).createCell(emptyCellIndex, Cell.CELL_TYPE_STRING);
@@ -270,6 +286,10 @@ public class XLSListWriter<E> extends XLSBaseWriter {
                                     } else {
                                         realSheet.addMergedRegion(new CellRangeAddress(sheetContext.getLastSheetRecordIndex() - rowCount + rowValueIndex,
                                                 sheetContext.getLastSheetRecordIndex() - rowCount + rowValueIndex, realSubColIndex, realSubColIndex + width - 1));
+                                        if (StringUtils.isNotEmpty(definition.getBasicInfoCollectionKey()) &&
+                                                getBasiceInfos().containsKey(definition.getBasicInfoCollectionKey())){
+                                            attachValidationConstraintToMergedCell(sheetContext, realSheet,definition, sheetContext.getLastSheetRecordIndex() - rowCount + rowValueIndex, sheetContext.getLastSheetRecordIndex() - rowCount + rowValueIndex, realSubColIndex, realSubColIndex + width - 1);
+                                        }
                                     }
                                     cell.setCellValue(xlsCellValue);
                                     cell.setCellStyle(fillCellStyle(sheetContext, xlsCellStyle, cellStyle));
@@ -301,6 +321,12 @@ public class XLSListWriter<E> extends XLSBaseWriter {
                 sheetContext.incProcessedEntityCount();
             }
         }
+    }
+
+    private void attachValidationConstraintToMergedCell(XLSSheetContext sheetContext, HSSFSheet realSheet,XLSColumnDefinition definition, int firstRow, int endRow, int firstCol, int endCol ) {
+        XLSBasicInfo basicInfo = (XLSBasicInfo) getBasiceInfos().get(definition.getBasicInfoCollectionKey());
+        CellRangeAddressList addressList = new CellRangeAddressList(firstRow,endRow,firstCol,endCol);
+        realSheet.addValidationData(basicInfo.createValidation(addressList,this));
     }
 
     private void addDummyRawRecordsToSheetRows(XLSSheetContext sheetContext) {
@@ -408,7 +434,8 @@ public class XLSListWriter<E> extends XLSBaseWriter {
                 if (!xlsColumnDefinition.isHidden()) {
                     if (hasSubColumns(xlsColumnDefinition)) {
                         for (int subCellIndex = 0; subCellIndex < xlsColumnDefinition.getSubColumns().size(); subCellIndex++) {
-                            XLSColumnDefinition subColDefinition = xlsColumnDefinition.getSubColumns().get(subCellIndex);
+                            List<XLSColumnDefinition> subColumns = xlsColumnDefinition.getSubColumns();
+                            XLSColumnDefinition subColDefinition = subColumns.get(subCellIndex);
                             Integer width = subColDefinition.getWidth();
                             realCellIndex = nextRealColIndex;
                             nextRealColIndex = realCellIndex + width;

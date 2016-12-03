@@ -4,6 +4,7 @@ import ir.dotin.utils.xls.mapper.XLSEntityToRowMapper;
 import ir.dotin.utils.xls.renderer.XLSListSectionRenderer;
 import ir.dotin.utils.xls.renderer.XLSRowCustomizer;
 import ir.dotin.utils.xls.renderer.XLSSectionRenderer;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,6 @@ public class XLSListReportSection<E> extends XLSReportSection {
 
     private String title;
     private List<XLSReportField> titleFields;
-    private List<XLSColumnDefinition> headerCols;
     private List<Map<String, String>> rawRecords;
     private List<E> records;
     private XLSRowCustomizer rowCustomizer;
@@ -40,14 +40,6 @@ public class XLSListReportSection<E> extends XLSReportSection {
 
     public void setTitleFields(List<XLSReportField> titleFields) {
         this.titleFields = titleFields;
-    }
-
-    public List<XLSColumnDefinition> getHeaderCols() {
-        return headerCols;
-    }
-
-    public void setHeaderCols(List<XLSColumnDefinition> headerCols) {
-        this.headerCols = headerCols;
     }
 
     public List<Map<String, String>> getRawRecords() {
@@ -110,4 +102,6 @@ public class XLSListReportSection<E> extends XLSReportSection {
         }
         getTitleFields().add(reportField);
     }
+
+
 }

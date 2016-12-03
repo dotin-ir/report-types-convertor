@@ -1,5 +1,6 @@
 package ir.dotin.utils.xls.domain;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by r.rastakfard on 7/2/2016.
  */
-public class XLSColumnDefinition implements Serializable {
+public class XLSColumnDefinition<B> implements Serializable {
     public static short SUM_AGGREGATION = 0;
     public static short AVG_AGGREGATION = 1;
 
@@ -31,11 +32,19 @@ public class XLSColumnDefinition implements Serializable {
     private boolean isUniqueColumn = false;
     private boolean mandatory = true;
     private Class<?> fieldType = String.class;
+    private String basicInfoCollectionKey;
+    private List<B> basicInfoCollection;
 
     public XLSColumnDefinition() {
     }
 
     public XLSColumnDefinition(int order, String name, String fName, short color) {
+        if (StringUtils.isEmpty(name)){
+            throw new IllegalArgumentException("Column name is Empty!");
+        }
+        if (StringUtils.isEmpty(fName)){
+            throw new IllegalArgumentException("Column fName is Empty!");
+        }
         this.order = order;
         this.name = name;
         this.fName = fName;
@@ -43,10 +52,8 @@ public class XLSColumnDefinition implements Serializable {
     }
 
     public XLSColumnDefinition(int order, String name, String fName, Integer width) {
+        this(width,name,fName);
         this.order = order;
-        this.name = name;
-        this.fName = fName;
-        this.width = width;
     }
 
     public XLSColumnDefinition(int order, String name, String fName, Integer width, boolean hidden) {
@@ -55,6 +62,12 @@ public class XLSColumnDefinition implements Serializable {
     }
 
     public XLSColumnDefinition(int width, String name, String fName) {
+        if (StringUtils.isEmpty(name)){
+            throw new IllegalArgumentException("Column name is Empty!");
+        }
+        if (StringUtils.isEmpty(fName)){
+            throw new IllegalArgumentException("Column fName is Empty!");
+        }
         this.width = width;
         this.name = name;
         this.fName = fName;
@@ -222,4 +235,21 @@ public class XLSColumnDefinition implements Serializable {
     public void setFieldType(Class<?> fieldType) {
         this.fieldType = fieldType;
     }
+
+    public void setBasicInfoCollectionKey(String bascInfoCollectionKey) {
+        this.basicInfoCollectionKey = bascInfoCollectionKey;
+    }
+
+    public String getBasicInfoCollectionKey() {
+        return basicInfoCollectionKey;
+    }
+
+    public void setBasicInfoCollection(List<B> bascInfoCollection) {
+        this.basicInfoCollection = bascInfoCollection;
+    }
+
+    public List<B> getBasicInfoCollection() {
+        return basicInfoCollection;
+    }
+
 }

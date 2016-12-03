@@ -49,7 +49,8 @@ public class XLSReflectiveRowToEntityMapper<E> implements XLSRowToEntityMapper<E
                     e.printStackTrace();
                 }
             } else {
-                for (XLSColumnDefinition subDefinition : definition.getSubColumns()) {
+                List<XLSColumnDefinition> subColumns = definition.getSubColumns();
+                for (XLSColumnDefinition subDefinition : subColumns) {
 
                 }
 

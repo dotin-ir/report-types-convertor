@@ -6,10 +6,8 @@ import ir.dotin.utils.xls.renderer.XLSDefaultRowCustomizer;
 import ir.dotin.utils.xls.renderer.XLSRowCustomizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.FontCharset;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.hssf.util.CellReference;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -22,11 +20,14 @@ import java.util.Map;
 /**
  * Created by r.rastakfard on 7/14/2016.
  */
-public abstract class XLSBaseWriter {
+public abstract class XLSBaseWriter<B> {
 
     protected HashMap<Integer, XLSSheetContext> sheetsContext = new HashMap<Integer, XLSSheetContext>();
     private Map<XLSCellFont, HSSFFont> workbookFonts;
     private XLSRowCustomizer defaultRowCustomizer = new XLSDefaultRowCustomizer();
+    private HSSFWorkbook workBook;
+    private String basicInfoSheetProtectionPassword;
+
 
     public XLSSheetContext getSheetContext(Integer sheetNo) {
         XLSSheetContext context = sheetsContext.get(sheetNo);
@@ -41,15 +42,16 @@ public abstract class XLSBaseWriter {
         return sheetsContext.values();
     }
 
-    protected void createSheet(HSSFWorkbook workbook, int sheetIndex, XLSSheetContext sheetContext) {
-        sheetContext.setWorkbook(workbook);
+    protected void createSheet(int sheetIndex, XLSSheetContext sheetContext) {
+        sheetContext.setWorkbook(getWorkBook());
         sheetContext.initColorsDescriptionList();
         String sheetName = sheetContext.getSheetName();
-        HSSFSheet sheet = workbook.createSheet(String.valueOf(StringUtils.isNotEmpty(sheetName) ? sheetName : sheetIndex));
+        HSSFSheet sheet = getWorkBook().createSheet(String.valueOf(StringUtils.isNotEmpty(sheetName) ? sheetName : sheetIndex));
         sheet.setRightToLeft(sheetContext.isRightToLeft());
         if (StringUtils.isNotEmpty(sheetContext.getReadOnlyPassword())) {
             sheet.protectSheet(sheetContext.getReadOnlyPassword());
         }
+        sheetContext.setSheetIndex(sheetIndex);
         sheetContext.setRealSheet(sheet);
     }
 
@@ -257,5 +259,150 @@ public abstract class XLSBaseWriter {
             }
             sheetContext.setReadOnlyPassword(password);
         }
+    }
+
+    private Map<String, XLSBasicInfo> basiceInfos;
+
+    public Map<String, XLSBasicInfo> getBasiceInfos() {
+        if (basiceInfos == null) {
+            basiceInfos = new HashMap<String, XLSBasicInfo>();
+        }
+        return basiceInfos;
+    }
+
+    public void setBasiceInfos(Map<String, XLSBasicInfo> basiceInfos) {
+        this.basiceInfos = basiceInfos;
+    }
+
+    public void addBasicInfoCollection(String basicInfoKey, String errorBoxTitle, String errorBoxMessage, List<B> collection) {
+        if (StringUtils.isNotEmpty(basicInfoKey)) {
+            if (getBasiceInfos().containsKey(basicInfoKey)) {
+                throw new IllegalArgumentException("Basic ifo with key '" + basicInfoKey + "' already exist!");
+            }
+            if (collection != null) {
+                XLSBasicInfo basicInfo = new XLSBasicInfo(basicInfoKey, errorBoxTitle, errorBoxMessage, collection);
+                getBasiceInfos().put(basicInfoKey, basicInfo);
+            }
+        } else {
+            throw new IllegalArgumentException("Basic ifo key is empty!");
+        }
+    }
+
+    protected int generateSheetIndex(XLSSheetContext sheetContext, int sheetIndex) {
+        return sheetIndex + 1;
+    }
+
+    protected void refreshBasicInfoBasedOnSheetContexts() {
+        for (XLSSheetContext sheetContext : getSheetContextsValues()) {
+            List<XLSColumnDefinition> columnsDefinition = getSheetContextColumnsDefinition(sheetContext);
+            int basicInfoCount = 0;
+            for (XLSColumnDefinition definition : columnsDefinition) {
+                if (StringUtils.isNotEmpty(definition.getBasicInfoCollectionKey())){
+                    if (!getBasiceInfos().containsKey(definition.getBasicInfoCollectionKey()) && definition.getBasicInfoCollection()==null){
+                        throw new RuntimeException("Basic information for column '" + definition.getName() + "' has no reference to data!");
+                    }
+                }
+                if (definition.getBasicInfoCollection() != null) {
+                    basicInfoCount += 1;
+                    String basicInfoCollectionKey = definition.getBasicInfoCollectionKey();
+                    if (StringUtils.isEmpty(basicInfoCollectionKey)) {
+                        basicInfoCollectionKey = String.valueOf(basicInfoCount);
+                    }
+                    addBasicInfoCollection(basicInfoCollectionKey, XLSUtils.getProperty(XLSConstants.DEFAULT_BASIC_INFO_SHEET_ERROR_TITLE),
+                            XLSUtils.getProperty(XLSConstants.DEFAULT_BASIC_INFO_SHEET_ERROR_MESSAGE), definition.getBasicInfoCollection());
+                    List<XLSColumnDefinition> subColumns = definition.getSubColumns();
+                    for (XLSColumnDefinition subDefinition : subColumns) {
+                        if (subDefinition.getBasicInfoCollection() != null) {
+                            basicInfoCount += 1;
+                            basicInfoCollectionKey = subDefinition.getBasicInfoCollectionKey();
+                            if (StringUtils.isEmpty(basicInfoCollectionKey)) {
+                                basicInfoCollectionKey = String.valueOf(basicInfoCount);
+                            }
+                            addBasicInfoCollection(basicInfoCollectionKey, XLSUtils.getProperty(XLSConstants.DEFAULT_BASIC_INFO_SHEET_ERROR_TITLE),
+                                    XLSUtils.getProperty(XLSConstants.DEFAULT_BASIC_INFO_SHEET_ERROR_MESSAGE), subDefinition.getBasicInfoCollection());
+                        }
+                    }
+                }
+            }
+        }
+        Map<String, XLSBasicInfo> basicInfos = getBasiceInfos();
+        if (!basicInfos.isEmpty()) {
+//            HSSFSheet sheet = getWorkBook().createSheet(XLSConstants.BASIC_INFO_SHEET_NAME);
+//            sheet.setRightToLeft(true);
+//            sheet.protectSheet(getBasicInfoSheetProtectionPassword());
+            int basicInfoCellIndex = 0;
+            for (String columnKey : basicInfos.keySet()) {
+                XLSBasicInfo basicInfo = basicInfos.get(columnKey);
+                basicInfo.setCellIndex(basicInfoCellIndex);
+//                Name namedCell = getWorkBook().createName();
+//                namedCell.setNameName(columnKey);
+//                namedCell.setSheetIndex(0);
+               /* namedCell.setRefersToFormula(XLSConstants.BASIC_INFO_SHEET_NAME + "!$" + CellReference.convertNumToColString(basicInfoCellIndex)
+                        + "$2:$" + CellReference.convertNumToColString(basicInfoCellIndex) + "$" + (basicInfo.getCollection().size() + 1));
+                DVConstraint constraint = DVConstraint.createFormulaListConstraint(XLSConstants.BASIC_INFO_SHEET_NAME + "!$" + CellReference.convertNumToColString(basicInfoCellIndex)
+                        + "$2:$" + CellReference.convertNumToColString(basicInfoCellIndex) + "$" + (basicInfo.getCollection().size() + 1));*/
+                /*DVConstraint constraint = DVConstraint.createFormulaListConstraint(XLSConstants.BASIC_INFO_SHEET_NAME + "!$" + CellReference.convertNumToColString(basicInfoCellIndex)
+                        + "$2:$" + CellReference.convertNumToColString(basicInfoCellIndex) + "$" + (basicInfo.getCollection().size()+1));*/
+//                basicInfo.setConstraint(constraint);
+//                createBasicInfoColumn(sheet, basicInfoCellIndex, columnKey, basicInfo);
+                basicInfoCellIndex++;
+            }
+//            int totalSheetCount = getTotalSheetCount();
+//            getWorkBook().setSheetHidden(totalSheetCount, true);
+        }
+    }
+
+    protected abstract List<XLSColumnDefinition> getSheetContextColumnsDefinition(XLSSheetContext sheetContext);
+
+    public void createBasicInfoColumn(HSSFSheet sheet, int basicInfoCellIndex, String columnKey, XLSBasicInfo basicInfo) {
+        HSSFRow headerRow = getRow(sheet, 0);
+        HSSFCell headerCell = headerRow.createCell(basicInfoCellIndex);
+        headerCell.setCellValue(columnKey);
+        int dataRowIndex = 1;
+        List<B> collection = basicInfo.getCollection();
+        for (B data : collection) {
+            HSSFRow dataRow = getRow(sheet, dataRowIndex);
+            dataRow.createCell(basicInfoCellIndex).setCellValue(data.toString());
+            dataRowIndex++;
+        }
+    }
+
+    protected HSSFRow getRow(HSSFSheet sheet, int rowIndex) {
+        HSSFRow row = sheet.getRow(rowIndex);
+        if (row == null) {
+            row = sheet.createRow(rowIndex);
+        }
+        return row;
+    }
+
+
+    public int getTotalSheetCount() {
+        return sheetsContext.size();
+    }
+
+    public HSSFWorkbook getWorkBook() {
+        if (workBook == null) {
+            workBook = new HSSFWorkbook();
+        }
+        return workBook;
+    }
+
+    public void setWorkBook(HSSFWorkbook workBook) {
+        this.workBook = workBook;
+    }
+
+    public void setBasicInfoSheetProtectionPassword(String basicInfoSheetProtectionPassword) {
+        this.basicInfoSheetProtectionPassword = basicInfoSheetProtectionPassword;
+    }
+
+    public String getBasicInfoSheetProtectionPassword() {
+        if (StringUtils.isEmpty(basicInfoSheetProtectionPassword)) {
+            return XLSConstants.DEFAULT_BASIC_INFO_SHEET_PASSWORD;
+        }
+        return basicInfoSheetProtectionPassword;
+    }
+
+    public boolean hasSheet(String sheetName){
+        return getWorkBook().getSheet(sheetName)!=null;
     }
 }

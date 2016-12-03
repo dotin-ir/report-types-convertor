@@ -22,6 +22,7 @@ import java.util.List;
 public class XLSListSectionRenderer extends XLSListWriter implements XLSSectionRenderer<XLSListReportSection> {
 
     public void renderSection(XLSSheetContext sheetContext, XLSListReportSection section) {
+        setWorkBook(section.getWorkBook());
         createHeaderPartForSection(section, sheetContext);
         createXLSRecords(section, sheetContext);
     }
@@ -75,6 +76,7 @@ public class XLSListSectionRenderer extends XLSListWriter implements XLSSectionR
     }
 
     private void createXLSRecords(XLSListReportSection section, XLSSheetContext sheetContext) {
+        setBasiceInfos(section.getBasicInfos());
         List<XLSColumnDefinition> columnsDefinition = section.getHeaderCols();
         XLSEntityToRowMapper entityToRowMapper = section.getEntityToRowMapper();
         addDummyRecords(sheetContext, entityToRowMapper);

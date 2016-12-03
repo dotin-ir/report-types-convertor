@@ -71,13 +71,12 @@ public class ExcelReportGenerator extends XLSBaseWriter {
 
     @Override
     public ByteArrayOutputStream createDocument() throws IOException {
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        int sheetIndex = 0;
+        int sheetIndex = 1;
         Collection<XLSSheetContext> sheetsContextValues = sheetsContext.values();
+        refreshBasicInfoBasedOnSheetContexts();
         for (XLSSheetContext sheetContext : sheetsContextValues) {
-            sheetIndex += 1;
             sheetContext.setReportGenerator(this);
-            createSheet(workbook, sheetIndex, sheetContext);
+            createSheet(sheetIndex, sheetContext);
             createReportTitleRow(sheetContext);
             createReportInformationRows(sheetContext);
             createReportConditionSection(sheetContext);
@@ -85,11 +84,14 @@ public class ExcelReportGenerator extends XLSBaseWriter {
             List<XLSListReportSection> reportSections = sheetContext.getReportSections();
             checkRowCountLimit(reportSections);
             for (XLSReportSection section : reportSections) {
+                section.setWorkBook(getWorkBook());
+                section.setBasicInfos(getBasiceInfos());
                 section.getRenderer().renderSection(sheetContext, section);
             }
+            sheetIndex = generateSheetIndex(sheetContext, sheetIndex);
         }
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        workbook.write(byteArrayOutputStream);
+        getWorkBook().write(byteArrayOutputStream);
         byteArrayOutputStream.flush();
         byteArrayOutputStream.close();
         return byteArrayOutputStream;
@@ -98,7 +100,7 @@ public class ExcelReportGenerator extends XLSBaseWriter {
     public void createReportColorsDescriptionTable(XLSSheetContext sheetContext) {
         if (sheetContext.hasColorDescriptionTable()) {
             int colorColWidth = 6;
-            sheetContext.createCell(XLSConstants.DEFAULT_COLORS_DESCRIPTION_TABLE_TITLE, 1, REPORT_TITLE_COL_SIZE + 1, 6, createPOIHeaderRowStyle(sheetContext, IndexedColors.LIGHT_ORANGE.getIndex(), true, true, true, true, 12), Cell.CELL_TYPE_STRING);
+            sheetContext.createCell(XLSUtils.getProperty(XLSConstants.DEFAULT_COLORS_DESCRIPTION_TABLE_TITLE), 1, REPORT_TITLE_COL_SIZE + 1, 6, createPOIHeaderRowStyle(sheetContext, IndexedColors.LIGHT_ORANGE.getIndex(), true, true, true, true, 12), Cell.CELL_TYPE_STRING);
             List<XLSColorDescription> colorsDescription = sheetContext.getColorsDescription();
             int colorRowIndex = 2;
             int colorColStep = 0;
@@ -121,6 +123,16 @@ public class ExcelReportGenerator extends XLSBaseWriter {
             sheetContext.getRealSheet().addMergedRegion(new CellRangeAddress(colorRowIndex, 4, REPORT_TITLE_COL_SIZE + 1 + colorColStep, REPORT_TITLE_COL_SIZE + 1 + colorColStep + colorColWidth - 1));
             System.out.println();
         }
+    }
+
+    protected List<XLSColumnDefinition> getSheetContextColumnsDefinition(XLSSheetContext sheetContext) {
+        List<XLSColumnDefinition> result = new ArrayList<XLSColumnDefinition>();
+        List<XLSReportSection> reportSections = sheetContext.getReportSections();
+        for (XLSReportSection section : reportSections) {
+            result.addAll(section.getHeaderCols());
+        }
+
+        return result;
     }
 
     private void checkRowCountLimit(List<XLSListReportSection> reportSections) {
