@@ -4,7 +4,7 @@
 
     <groupId>ir.dotin.core.utils</groupId>
     <artifactId>report-types-convertor</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.5-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -99,7 +99,7 @@
         <developerConnection>
             scm:git:https://gsc.dotin.local:8446/tfs/CoreCollection/Utility/_git/report-types-convertor
         </developerConnection>
-        <tag>report-types-convertor-1.4.4</tag>
+        <tag>${project.artifactId}-${project.version}</tag>
     </scm>
 
 </project>
