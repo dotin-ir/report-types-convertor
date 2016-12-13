@@ -1,6 +1,7 @@
 package ir.dotin.utils.xls.domain.builder;
 
 import ir.dotin.utils.xls.domain.XLSRowCellsData;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -16,6 +17,7 @@ public class XLSRowCellsDataBuilder {
     }
 
     public XLSRowCellsDataBuilder addCellSimpleData(String key, String value) {
+        key = checkKey(key);
         List<Map<String, String>> convertedValue = new ArrayList<Map<String, String>>();
         Map<String, String> map = new HashMap<String, String>();
         map.put(key, value);
@@ -24,7 +26,16 @@ public class XLSRowCellsDataBuilder {
         return this;
     }
 
+    private String checkKey(String key) {
+        if (StringUtils.isEmpty(key)){
+            throw new RuntimeException("Key parameter is empty!");
+        }
+        key = key.trim();
+        return key;
+    }
+
     public XLSRowCellsDataBuilder addCellListData(String key, List<String> values) {
+        key = checkKey(key);
         List<Map<String, String>> convertedValue = new ArrayList<Map<String, String>>();
         for (String value : values) {
             Map<String, String> map = new HashMap<String, String>();
@@ -39,6 +50,7 @@ public class XLSRowCellsDataBuilder {
     }
 
     public XLSRowCellsDataBuilder addCellSimpleData(String key, List<String> values) {
+        key = checkKey(key);
         List<Map<String, String>> convertedValue = new ArrayList<Map<String, String>>();
         for (String value : values) {
             Map<String, String> map = new HashMap<String, String>();
@@ -53,6 +65,7 @@ public class XLSRowCellsDataBuilder {
     }
 
     public XLSRowCellsDataBuilder addEntityListCellsData(String key, List<Map<String, String>> values) {
+        key = checkKey(key);
         row.put(key, values);
         if (maxRowLength < values.size()) {
             maxRowLength = values.size();
@@ -61,6 +74,7 @@ public class XLSRowCellsDataBuilder {
     }
 
     public XLSRowCellsDataBuilder addEntityCellsData(String key, Map<String, String> values) {
+        key = checkKey(key);
         row.put(key, Arrays.asList(values));
         return this;
     }

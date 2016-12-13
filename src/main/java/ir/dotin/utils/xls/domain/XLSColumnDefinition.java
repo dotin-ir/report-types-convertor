@@ -18,7 +18,7 @@ public class XLSColumnDefinition<B> implements Serializable {
     public static short AVG_AGGREGATION = 1;
 
     private boolean hidden = false;
-    private Integer order;
+    private Integer order = Integer.MAX_VALUE;
     private String name;
     private String fName;
     /* based on character*/
@@ -68,9 +68,9 @@ public class XLSColumnDefinition<B> implements Serializable {
         if (StringUtils.isEmpty(fName)){
             throw new IllegalArgumentException("Column fName is Empty!");
         }
+        this.name = name.trim();
         this.width = width;
-        this.name = name;
-        this.fName = fName;
+        this.fName = fName.trim();
     }
 
     public Integer getOrder() {
