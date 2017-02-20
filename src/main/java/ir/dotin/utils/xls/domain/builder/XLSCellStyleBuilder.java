@@ -1,8 +1,6 @@
 package ir.dotin.utils.xls.domain.builder;
 
-import ir.dotin.utils.xls.domain.XLSCellStyle;
-import ir.dotin.utils.xls.domain.XLSColorDescription;
-import ir.dotin.utils.xls.domain.XLSSheetContext;
+import ir.dotin.utils.xls.domain.*;
 import ir.dotin.utils.xls.renderer.XLSDefaultRowCustomizer;
 import org.apache.commons.lang.StringUtils;
 
@@ -27,6 +25,27 @@ public class XLSCellStyleBuilder<B> {
         result = new HashMap<String, XLSCellStyle>();
         fontsColor = new HashMap<String, Short>();
         fontsName = new HashMap<String, String>();
+    }
+
+    public XLSCellStyleBuilder addCellDesignWithFormat(String cellName, String format) {
+        if (StringUtils.isEmpty(cellName)) {
+            throw new IllegalArgumentException("Cell Name is Empty!");
+        }
+        if (StringUtils.isEmpty(format)) {
+            throw new IllegalArgumentException("Cell format is Empty!");
+        }
+        XLSCellStyle cellDesign = result.get(cellName);
+        if (cellDesign==null) {
+            boolean even = (sheetContext.getProcessedEntityCount()) % 2 == 0;
+            String colorKey = even ? XLSConstants.DEFAULT_EVEN_ROW_COLOR_KEY : XLSConstants.DEFAULT_ODD_ROW_COLOR_KEY;
+            XLSColorDescription bgColorDescription = sheetContext.getColorDescription(colorKey);
+            XLSColorDescription fontColorDescription = sheetContext.getColorDescription(XLSConstants.DEFAULT_FONT_COLOR_KEY);
+            cellDesign = new XLSCellStyle(new XLSCellFont(fontColorDescription, XLSConstants.DEFAULT_FONT_NAME), bgColorDescription, format);
+        }else{
+            cellDesign.setFormat(format);
+        }
+        result.put(cellName, cellDesign);
+        return this;
     }
 
     public XLSCellStyleBuilder addCellDesignWithBackgroundColor(String cellName, XLSCellStyle cellDesign) {

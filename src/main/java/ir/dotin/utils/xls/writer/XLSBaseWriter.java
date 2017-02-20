@@ -6,7 +6,6 @@ import ir.dotin.utils.xls.renderer.XLSDefaultRowCustomizer;
 import ir.dotin.utils.xls.renderer.XLSRowCustomizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.ByteArrayOutputStream;
@@ -27,6 +26,7 @@ public abstract class XLSBaseWriter<B> {
     private XLSRowCustomizer defaultRowCustomizer = new XLSDefaultRowCustomizer();
     private HSSFWorkbook workBook;
     private String basicInfoSheetProtectionPassword;
+    private DataFormat dataFormat;
 
 
     public XLSSheetContext getSheetContext(Integer sheetNo) {
@@ -95,7 +95,11 @@ public abstract class XLSBaseWriter<B> {
         style.setFillForegroundColor(colorDescription.getColorIndex());
         style.setAlignment(CellStyle.ALIGN_CENTER);
         style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-        style.setDataFormat(HSSFDataFormat.getBuiltinFormat(xlsCellStyle.getFormat()));
+        if (xlsCellStyle.getFormat().equals(XLSConstants.DEFAULT_CELL_FORMAT)) {
+            style.setDataFormat(HSSFDataFormat.getBuiltinFormat(xlsCellStyle.getFormat()));
+        } else {
+            style.setDataFormat(getDataFormat().getFormat(xlsCellStyle.getFormat()));
+        }
         style.setWrapText(true);
         if (xlsCellStyle.getHasBottomBorder()) {
             style.setBorderBottom(CellStyle.BORDER_THIN);
@@ -297,8 +301,8 @@ public abstract class XLSBaseWriter<B> {
             List<XLSColumnDefinition> columnsDefinition = getSheetContextColumnsDefinition(sheetContext);
             int basicInfoCount = 0;
             for (XLSColumnDefinition definition : columnsDefinition) {
-                if (StringUtils.isNotEmpty(definition.getBasicInfoCollectionKey())){
-                    if (!getBasiceInfos().containsKey(definition.getBasicInfoCollectionKey()) && definition.getBasicInfoCollection()==null){
+                if (StringUtils.isNotEmpty(definition.getBasicInfoCollectionKey())) {
+                    if (!getBasiceInfos().containsKey(definition.getBasicInfoCollectionKey()) && definition.getBasicInfoCollection() == null) {
                         throw new RuntimeException("Basic information for column '" + definition.getName() + "' has no reference to data!");
                     }
                 }
@@ -402,7 +406,18 @@ public abstract class XLSBaseWriter<B> {
         return basicInfoSheetProtectionPassword;
     }
 
-    public boolean hasSheet(String sheetName){
-        return getWorkBook().getSheet(sheetName)!=null;
+    public boolean hasSheet(String sheetName) {
+        return getWorkBook().getSheet(sheetName) != null;
+    }
+
+    public DataFormat getDataFormat() {
+        if (dataFormat == null) {
+            dataFormat = getWorkBook().createDataFormat();
+        }
+        return dataFormat;
+    }
+
+    public void setDataFormat(DataFormat dataFormat) {
+        this.dataFormat = dataFormat;
     }
 }
